@@ -293,24 +293,57 @@ function App() {
               </Typography>
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button 
-                  variant="contained" 
-                  fullWidth
-                  size="large"
-                  onClick={handleShare}
-                  sx={{ 
-                    py: 1.5,
-                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, #1976D2 30%, #1E88E5 90%)',
-                    }
-                  }}
-                >
-                  결과 공유하기
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button 
+                    variant="contained" 
+                    fullWidth
+                    size="large"
+                    onClick={handleShare}
+                    sx={{ 
+                      py: 1.5,
+                      background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #1976D2 30%, #1E88E5 90%)',
+                      }
+                    }}
+                  >
+                    결과 공유하기
+                  </Button>
+                  
+                  <Button 
+                    variant="outlined" 
+                    fullWidth
+                    size="large"
+                    onClick={() => {
+                      const text = "친구가 보는 나의 MBTI를 테스트해보세요!";
+                      const url = window.location.href;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: '친구가 보는 나의 MBTI',
+                          text: text,
+                          url: url
+                        });
+                      } else {
+                        navigator.clipboard.writeText(`${text}\n${url}`);
+                        setSnackbarOpen(true);
+                      }
+                    }}
+                    sx={{ 
+                      py: 1.5,
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      '&:hover': {
+                        borderColor: 'primary.dark',
+                        backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                      }
+                    }}
+                  >
+                    서비스 공유하기
+                  </Button>
+                </Box>
                 
                 <Button 
-                  variant="outlined" 
+                  variant="text" 
                   fullWidth
                   size="large"
                   onClick={() => {
@@ -320,44 +353,13 @@ function App() {
                   }}
                   sx={{ 
                     py: 1.5,
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                    '&:hover': {
-                      borderColor: 'primary.dark',
-                      backgroundColor: 'rgba(25, 118, 210, 0.04)'
-                    }
-                  }}
-                >
-                  다시 해보기
-                </Button>
-                
-                <Button 
-                  variant="text" 
-                  fullWidth
-                  size="large"
-                  onClick={() => {
-                    const text = "친구가 보는 나의 MBTI를 테스트해보세요!";
-                    const url = window.location.href;
-                    if (navigator.share) {
-                      navigator.share({
-                        title: '친구가 보는 나의 MBTI',
-                        text: text,
-                        url: url
-                      });
-                    } else {
-                      navigator.clipboard.writeText(`${text}\n${url}`);
-                      setSnackbarOpen(true);
-                    }
-                  }}
-                  sx={{ 
-                    py: 1.5,
                     color: 'text.secondary',
                     '&:hover': {
                       backgroundColor: 'rgba(0, 0, 0, 0.04)'
                     }
                   }}
                 >
-                  서비스 공유하기
+                  다시 해보기
                 </Button>
               </Box>
             </Paper>
