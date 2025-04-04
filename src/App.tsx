@@ -157,10 +157,11 @@ function App() {
         const canvas = await html2canvas(resultRef.current);
         const image = canvas.toDataURL('image/png');
         
-        // 이미지를 클립보드에 복사
-        const blob = await (await fetch(image)).blob();
-        const item = new ClipboardItem({ 'image/png': blob });
-        await navigator.clipboard.write([item]);
+        // 이미지 다운로드 링크 생성
+        const link = document.createElement('a');
+        link.download = `mbti-result-${mbtiResult}.png`;
+        link.href = image;
+        link.click();
         
         // 텍스트도 함께 복사
         const text = `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`;
