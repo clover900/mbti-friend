@@ -295,22 +295,6 @@ function App() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button 
-                    variant="contained" 
-                    fullWidth
-                    size="large"
-                    onClick={handleShare}
-                    sx={{ 
-                      py: 1.5,
-                      background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #1976D2 30%, #1E88E5 90%)',
-                      }
-                    }}
-                  >
-                    결과 공유하기
-                  </Button>
-                  
-                  <Button 
                     variant="outlined" 
                     fullWidth
                     size="large"
@@ -339,6 +323,22 @@ function App() {
                     }}
                   >
                     서비스 공유하기
+                  </Button>
+                  
+                  <Button 
+                    variant="contained" 
+                    fullWidth
+                    size="large"
+                    onClick={handleShare}
+                    sx={{ 
+                      py: 1.5,
+                      backgroundColor: 'primary.main',
+                      '&:hover': {
+                        backgroundColor: 'primary.dark'
+                      }
+                    }}
+                  >
+                    결과 공유하기
                   </Button>
                 </Box>
                 
