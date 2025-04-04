@@ -256,26 +256,110 @@ function App() {
           {currentStep > questions.length && (
             <Paper 
               elevation={3} 
-              sx={{ p: 3, textAlign: 'center' }}
+              sx={{ 
+                p: 3, 
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
+              }}
               ref={resultRef}
             >
               <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                 당신의 MBTI는...
               </Typography>
-              <Typography variant="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+              <Typography 
+                variant="h2" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 2
+                }}
+              >
                 {mbtiResult}
               </Typography>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom
+                sx={{ 
+                  color: 'text.secondary',
+                  mb: 3
+                }}
+              >
                 {mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}
               </Typography>
-              <Button 
-                variant="contained" 
-                fullWidth
-                sx={{ mt: 2 }}
-                onClick={handleShare}
-              >
-                결과 공유하기
-              </Button>
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Button 
+                  variant="contained" 
+                  fullWidth
+                  size="large"
+                  onClick={handleShare}
+                  sx={{ 
+                    py: 1.5,
+                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #1976D2 30%, #1E88E5 90%)',
+                    }
+                  }}
+                >
+                  결과 공유하기
+                </Button>
+                
+                <Button 
+                  variant="outlined" 
+                  fullWidth
+                  size="large"
+                  onClick={() => {
+                    setCurrentStep(0);
+                    setAnswers([]);
+                    setMbtiResult('');
+                  }}
+                  sx={{ 
+                    py: 1.5,
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    '&:hover': {
+                      borderColor: 'primary.dark',
+                      backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                    }
+                  }}
+                >
+                  다시 해보기
+                </Button>
+                
+                <Button 
+                  variant="text" 
+                  fullWidth
+                  size="large"
+                  onClick={() => {
+                    const text = "친구가 보는 나의 MBTI를 테스트해보세요!";
+                    const url = window.location.href;
+                    if (navigator.share) {
+                      navigator.share({
+                        title: '친구가 보는 나의 MBTI',
+                        text: text,
+                        url: url
+                      });
+                    } else {
+                      navigator.clipboard.writeText(`${text}\n${url}`);
+                      setSnackbarOpen(true);
+                    }
+                  }}
+                  sx={{ 
+                    py: 1.5,
+                    color: 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  서비스 공유하기
+                </Button>
+              </Box>
             </Paper>
           )}
         </Container>
@@ -286,8 +370,12 @@ function App() {
           onClose={() => setSnackbarOpen(false)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert onClose={() => setSnackbarOpen(false)} severity="success">
-            결과가 클립보드에 복사되었습니다!
+          <Alert 
+            onClose={() => setSnackbarOpen(false)} 
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            클립보드에 복사되었습니다!
           </Alert>
         </Snackbar>
       </Box>
