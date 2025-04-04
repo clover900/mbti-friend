@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Container, 
   Box, 
@@ -7,10 +7,13 @@ import {
   Paper,
   AppBar,
   Toolbar,
-  MobileStepper
+  MobileStepper,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import html2canvas from 'html2canvas';
 
 // 모바일 친화적인 테마 설정
 const theme = createTheme({
@@ -28,6 +31,9 @@ const theme = createTheme({
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
+  const [mbtiResult, setMbtiResult] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const questions = [
     {
@@ -126,8 +132,6 @@ function App() {
     setMbtiResult(mbti);
   };
 
-  const [mbtiResult, setMbtiResult] = useState('');
-
   const mbtiDescriptions = {
     'ISTJ': '신뢰할 수 있는 현실주의자',
     'ISFJ': '용감한 수호자',
@@ -145,6 +149,28 @@ function App() {
     'ESFJ': '사교적인 외교관',
     'ENFJ': '정의로운 사회운동가',
     'ENTJ': '대담한 통솔자'
+  };
+
+  const handleShare = async () => {
+    if (resultRef.current) {
+      try {
+        const canvas = await html2canvas(resultRef.current);
+        const image = canvas.toDataURL('image/png');
+        
+        // 이미지를 클립보드에 복사
+        const blob = await (await fetch(image)).blob();
+        const item = new ClipboardItem({ 'image/png': blob });
+        await navigator.clipboard.write([item]);
+        
+        // 텍스트도 함께 복사
+        const text = `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`;
+        await navigator.clipboard.writeText(text);
+        
+        setSnackbarOpen(true);
+      } catch (error) {
+        console.error('공유하기 실패:', error);
+      }
+    }
   };
 
   return (
@@ -211,7 +237,11 @@ function App() {
           )}
 
           {currentStep > questions.length && (
-            <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
+            <Paper 
+              elevation={3} 
+              sx={{ p: 3, textAlign: 'center' }}
+              ref={resultRef}
+            >
               <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                 당신의 MBTI는...
               </Typography>
@@ -225,17 +255,24 @@ function App() {
                 variant="contained" 
                 fullWidth
                 sx={{ mt: 2 }}
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`
-                  );
-                }}
+                onClick={handleShare}
               >
                 결과 공유하기
               </Button>
             </Paper>
           )}
         </Container>
+
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={3000} 
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="success">
+            결과가 클립보드에 복사되었습니다!
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
