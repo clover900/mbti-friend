@@ -37,53 +37,53 @@ function App() {
 
   const questions = [
     {
-      question: "친구는 새로운 사람들과 쉽게 친해지나요?",
-      options: ["네, 매우 활발하게 대화를 나눕니다", "아니요, 조금 소극적인 편입니다"],
+      question: "친구와 함께 놀이공원에 갔을 때, 친구는 어떤 놀이기구를 먼저 타고 싶어할까요?",
+      options: ["롤러코스터처럼 스릴 넘치는 놀이기구", "회전목마처럼 평화로운 놀이기구"],
       type: "E/I"
     },
     {
-      question: "친구는 계획을 세우는 것을 좋아하나요?",
-      options: ["네, 모든 것을 계획적으로 합니다", "아니요, 즉흥적인 것을 좋아합니다"],
+      question: "친구가 여행 계획을 세울 때 어떤 스타일일까요?",
+      options: ["시간별로 세세하게 계획을 짜는 편", "대충 가고 싶은 곳만 정해두고 즉흥적으로 다니는 편"],
       type: "J/P"
     },
     {
-      question: "친구는 논리적인 판단을 하나요?",
-      options: ["네, 이성적으로 판단합니다", "아니요, 감정적으로 판단합니다"],
+      question: "친구가 영화를 볼 때 어떤 부분에 더 집중할까요?",
+      options: ["스토리의 논리성과 전개", "캐릭터의 감정과 분위기"],
       type: "T/F"
     },
     {
-      question: "친구는 마감일을 잘 지키나요?",
-      options: ["네, 항상 시간을 잘 지킵니다", "아니요, 유연하게 대처합니다"],
+      question: "친구가 과제나 일을 할 때 어떤 스타일일까요?",
+      options: ["마감일보다 훨씬 일찍 시작해서 여유있게 끝내는 편", "마감 직전에 몰아서 하는 편"],
       type: "J/P"
     },
     {
-      question: "친구는 새로운 경험을 좋아하나요?",
-      options: ["네, 새로운 것을 시도하는 것을 좋아합니다", "아니요, 익숙한 것을 선호합니다"],
+      question: "친구가 새로운 카페에 갔을 때 어떤 음료를 주문할까요?",
+      options: ["메뉴판에 없는 시그니처 음료", "항상 마시던 익숙한 음료"],
       type: "S/N"
     },
     {
-      question: "친구는 상상력이 풍부한 편인가요?",
-      options: ["네, 창의적인 생각을 많이 합니다", "아니요, 현실적인 생각을 합니다"],
+      question: "친구가 구름을 볼 때 어떤 생각을 할까요?",
+      options: ["'저 구름은 뭔가 동물 모양 같아'라고 상상하는 편", "오늘 날씨가 어떤지 생각하는 편"],
       type: "S/N"
     },
     {
-      question: "친구는 갈등 상황에서 어떻게 대처하나요?",
-      options: ["직접적으로 해결하려고 합니다", "조화롭게 해결하려고 합니다"],
+      question: "친구가 다른 사람과 의견이 다를 때 어떻게 할까요?",
+      options: ["자신의 의견을 직접적으로 말하는 편", "상대방의 기분을 고려하며 조심스럽게 말하는 편"],
       type: "T/F"
     },
     {
-      question: "친구는 휴식 시간을 어떻게 보내나요?",
-      options: ["혼자 있는 시간이 필요합니다", "사람들과 함께 있는 것을 좋아합니다"],
+      question: "친구가 주말을 보내는 방식은?",
+      options: ["집에서 혼자 영화보거나 게임하는 편", "친구들과 만나서 놀거나 외출하는 편"],
       type: "E/I"
     },
     {
-      question: "친구는 미래에 대해 어떻게 생각하나요?",
-      options: ["미래의 가능성을 많이 생각합니다", "현재의 상황을 중시합니다"],
+      question: "친구가 미래에 대해 이야기할 때 어떤 얘기를 할까요?",
+      options: ["10년 후의 꿈과 비전에 대해", "다음 주에 할 일에 대해"],
       type: "S/N"
     },
     {
-      question: "친구는 결정을 내릴 때 어떻게 하나요?",
-      options: ["신중하게 생각한 후 결정합니다", "직관적으로 빠르게 결정합니다"],
+      question: "친구가 점심 메뉴를 고를 때 어떤 스타일일까요?",
+      options: ["메뉴판을 꼼꼼히 읽고 신중하게 고르는 편", "첫 눈에 반한 메뉴를 바로 고르는 편"],
       type: "J/P"
     }
   ];
@@ -157,11 +157,27 @@ function App() {
         const canvas = await html2canvas(resultRef.current);
         const image = canvas.toDataURL('image/png');
         
-        // 이미지 다운로드 링크 생성
-        const link = document.createElement('a');
-        link.download = `mbti-result-${mbtiResult}.png`;
-        link.href = image;
-        link.click();
+        // Web Share API 사용
+        if (navigator.share) {
+          const blob = await (await fetch(image)).blob();
+          const file = new File([blob], `mbti-result-${mbtiResult}.png`, { type: 'image/png' });
+          
+          try {
+            await navigator.share({
+              title: '내 MBTI 결과',
+              text: `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`,
+              files: [file]
+            });
+          } catch (error) {
+            console.log('공유 취소됨');
+          }
+        } else {
+          // Web Share API를 지원하지 않는 경우
+          const link = document.createElement('a');
+          link.download = `mbti-result-${mbtiResult}.png`;
+          link.href = image;
+          link.click();
+        }
         
         // 텍스트도 함께 복사
         const text = `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`;
