@@ -97,6 +97,25 @@ function App() {
     }
   };
 
+  const mbtiResultTexts = {
+    'ISTJ': '꼼꼼하고 믿음직한 친구',
+    'ISFJ': '따뜻하고 배려심 많은 친구',
+    'INFJ': '이해심 많고 영감 있는 친구',
+    'INTJ': '똑똑하고 계획적인 친구',
+    'ISTP': '손재주 좋고 실용적인 친구',
+    'ISFP': '감성적이고 자유로운 친구',
+    'INFP': '이상적이고 따뜻한 친구',
+    'INTP': '호기심 많고 논리적인 친구',
+    'ESTP': '모험심 많고 활발한 친구',
+    'ESFP': '즐겁고 사교적인 친구',
+    'ENFP': '열정적이고 창의적인 친구',
+    'ENTP': '도전적이고 재치있는 친구',
+    'ESTJ': '책임감 있고 조직적인 친구',
+    'ESFJ': '친절하고 배려심 많은 친구',
+    'ENFJ': '리더십 있고 배려심 많은 친구',
+    'ENTJ': '목표의식 있고 결단력 있는 친구'
+  };
+
   const calculateMBTI = () => {
     const mbtiTypes = {
       E: 0, I: 0,
@@ -132,32 +151,12 @@ function App() {
     setMbtiResult(mbti);
   };
 
-  const mbtiDescriptions = {
-    'ISTJ': '신뢰할 수 있는 현실주의자',
-    'ISFJ': '용감한 수호자',
-    'INFJ': '선의의 옹호자',
-    'INTJ': '용의주도한 전략가',
-    'ISTP': '만능 재주꾼',
-    'ISFP': '호기심 많은 예술가',
-    'INFP': '열정적인 중재자',
-    'INTP': '논리적인 사색가',
-    'ESTP': '모험을 즐기는 사업가',
-    'ESFP': '자유로운 영혼의 연예인',
-    'ENFP': '재기발랄한 활동가',
-    'ENTP': '논쟁을 즐기는 변론가',
-    'ESTJ': '엄격한 관리자',
-    'ESFJ': '사교적인 외교관',
-    'ENFJ': '정의로운 사회운동가',
-    'ENTJ': '대담한 통솔자'
-  };
-
   const handleShare = async () => {
     if (resultRef.current) {
       try {
         const canvas = await html2canvas(resultRef.current);
         const image = canvas.toDataURL('image/png');
         
-        // Web Share API 사용
         if (navigator.share) {
           const blob = await (await fetch(image)).blob();
           const file = new File([blob], `mbti-result-${mbtiResult}.png`, { type: 'image/png' });
@@ -165,22 +164,20 @@ function App() {
           try {
             await navigator.share({
               title: '내 MBTI 결과',
-              text: `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`,
+              text: `내 친구가 생각하는 나는 ${mbtiResult} 타입이야!\n${mbtiResultTexts[mbtiResult as keyof typeof mbtiResultTexts]}라고 생각한대!`,
               files: [file]
             });
           } catch (error) {
             console.log('공유 취소됨');
           }
         } else {
-          // Web Share API를 지원하지 않는 경우
           const link = document.createElement('a');
           link.download = `mbti-result-${mbtiResult}.png`;
           link.href = image;
           link.click();
         }
         
-        // 텍스트도 함께 복사
-        const text = `내 친구가 생각하는 나의 MBTI는 ${mbtiResult} (${mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}) 입니다!`;
+        const text = `내 친구가 생각하는 나는 ${mbtiResult} 타입이야!\n${mbtiResultTexts[mbtiResult as keyof typeof mbtiResultTexts]}라고 생각한대!`;
         await navigator.clipboard.writeText(text);
         
         setSnackbarOpen(true);
@@ -253,115 +250,25 @@ function App() {
             </Paper>
           )}
 
-          {currentStep > questions.length && (
-            <Paper 
-              elevation={3} 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2
-              }}
-              ref={resultRef}
-            >
+          {currentStep === questions.length + 1 && (
+            <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }} ref={resultRef}>
               <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                당신의 MBTI는...
+                친구가 보는 나의 MBTI
               </Typography>
-              <Typography 
-                variant="h2" 
-                gutterBottom 
-                sx={{ 
-                  fontWeight: 'bold',
-                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 2
-                }}
+              <Typography variant="h5" gutterBottom sx={{ mt: 2 }}>
+                친구야, 내가 볼 때 넌 {mbtiResult} 타입이야!
+              </Typography>
+              <Typography variant="h6" gutterBottom sx={{ color: 'text.secondary' }}>
+                {mbtiResultTexts[mbtiResult as keyof typeof mbtiResultTexts]} 같아!
+              </Typography>
+              <Button 
+                variant="contained" 
+                onClick={handleShare}
+                size="large"
+                sx={{ mt: 2 }}
               >
-                {mbtiResult}
-              </Typography>
-              <Typography 
-                variant="h6" 
-                gutterBottom
-                sx={{ 
-                  color: 'text.secondary',
-                  mb: 3
-                }}
-              >
-                {mbtiDescriptions[mbtiResult as keyof typeof mbtiDescriptions]}
-              </Typography>
-              
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button 
-                    variant="outlined" 
-                    fullWidth
-                    size="large"
-                    onClick={() => {
-                      const text = "친구가 보는 나의 MBTI를 테스트해보세요!";
-                      const url = window.location.href;
-                      if (navigator.share) {
-                        navigator.share({
-                          title: '친구가 보는 나의 MBTI',
-                          text: text,
-                          url: url
-                        });
-                      } else {
-                        navigator.clipboard.writeText(`${text}\n${url}`);
-                        setSnackbarOpen(true);
-                      }
-                    }}
-                    sx={{ 
-                      py: 1.5,
-                      borderColor: 'primary.main',
-                      color: 'primary.main',
-                      '&:hover': {
-                        borderColor: 'primary.dark',
-                        backgroundColor: 'rgba(25, 118, 210, 0.04)'
-                      }
-                    }}
-                  >
-                    서비스 공유하기
-                  </Button>
-                  
-                  <Button 
-                    variant="contained" 
-                    fullWidth
-                    size="large"
-                    onClick={handleShare}
-                    sx={{ 
-                      py: 1.5,
-                      backgroundColor: 'primary.main',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark'
-                      }
-                    }}
-                  >
-                    결과 공유하기
-                  </Button>
-                </Box>
-                
-                <Button 
-                  variant="text" 
-                  fullWidth
-                  size="large"
-                  onClick={() => {
-                    setCurrentStep(0);
-                    setAnswers([]);
-                    setMbtiResult('');
-                  }}
-                  sx={{ 
-                    py: 1.5,
-                    color: 'text.secondary',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                    }
-                  }}
-                >
-                  다시 해보기
-                </Button>
-              </Box>
+                결과 공유하기
+              </Button>
             </Paper>
           )}
         </Container>
